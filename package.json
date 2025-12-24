@@ -11,6 +11,7 @@
     "start": "node dist/server.js",
     "dev": "bun src/server.ts",
     "prepare": "bun run build",
+    "postinstall": "bun run build",
     "typecheck": "tsc --noEmit",
     "test": "echo \"No tests specified\" && exit 0"
   },
