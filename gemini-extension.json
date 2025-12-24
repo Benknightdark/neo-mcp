@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "High-performance filesystem tools powered by Bun.",
   "mcpServers": {
-    "bun-tools": {
-      "command": "bun",
+    "neo-tools": {
+      "command": "node",
       "args": ["${extensionPath}/dist/server.js"],
       "env": {
         "BUN_VERSION": "1.0"
