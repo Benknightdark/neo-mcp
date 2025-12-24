@@ -5,11 +5,11 @@
   "description": "Neo Tools MCP Server",
   "main": "dist/server.js",
   "scripts": {
-    "build": "bun run build:bundle",
-    "build:tsc": "tsc",
-    "build:bundle": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && bun build src/server.ts --outdir dist --target bun --minify && cp -r src/prompts dist/prompts",
-    "start": "bun dist/server.js",
-    "dev": "bun run src/server.ts",
+    "build": "bun run clean && bun run build:bundle",
+    "build:bundle": "bun build src/server.ts --outdir dist --target node --minify",
+    "clean": "rm -rf dist",
+    "start": "node dist/server.js",
+    "dev": "bun src/server.ts",
     "prepare": "bun run build",
     "typecheck": "tsc --noEmit",
     "test": "echo \"No tests specified\" && exit 0"
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.25.1",
+    "toml": "^3.0.0",
     "zod": "^4.2.1"
   }
 }

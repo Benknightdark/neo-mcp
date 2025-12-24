@@ -1,7 +1,20 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import { spawnSync } from "child_process";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import toml from "toml";
+// @ts-ignore
+import gitCommitConfig from "../commands/git-commit.toml" with { type: "text" };
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 解析內嵌的 TOML 內容
+const prompts = toml.parse(gitCommitConfig) as any;
 
 // 初始化 MCP Server
 const server = new McpServer({
@@ -19,21 +32,20 @@ server.registerTool(
     },
   },
   async ({ message }) => {
-    const { exitCode, stdout, stderr } = Bun.spawnSync(["git", "commit", "-m", message], {
+    const { status, stdout, stderr } = spawnSync("git", ["commit", "-m", message], {
       cwd: process.cwd(),
+      encoding: "utf-8",
     });
 
-    if (exitCode !== 0) {
-      const error = new TextDecoder().decode(stderr);
+    if (status !== 0) {
       return {
-        content: [{ type: "text", text: `Commit 失敗:\n${error}` }],
+        content: [{ type: "text", text: `Commit 失敗:\n${stderr}` }],
         isError: true,
       };
     }
 
-    const output = new TextDecoder().decode(stdout);
     return {
-      content: [{ type: "text", text: `Commit 成功:\n${output}` }],
+      content: [{ type: "text", text: `Commit 成功:\n${stdout}` }],
     };
   }
 );
@@ -46,17 +58,16 @@ server.registerPrompt(
   },
   async () => {
     // 1. 執行 git add .
-    Bun.spawnSync(["git", "add", "."], { cwd: process.cwd() });
+    spawnSync("git", ["add", "."], { cwd: process.cwd() });
 
     // 2. 取得 git diff --staged
-    const { stdout } = Bun.spawnSync(["git", "diff", "--staged"], { cwd: process.cwd() });
-    const diff = new TextDecoder().decode(stdout);
+    const { stdout } = spawnSync("git", ["diff", "--staged"], { 
+      cwd: process.cwd(),
+      encoding: "utf-8"
+    });
+    const diff = stdout;
 
     // 3. 組合 Prompt
-    // 從 src/prompts/git-commit.toml 讀取 Prompt Template
-    const tomlPath = `${import.meta.dir}/prompts/git-commit.toml`;
-    const tomlContent = await Bun.file(tomlPath).text();
-    const prompts = Bun.TOML.parse(tomlContent) as any;
     const promptTemplate = prompts.git_commit.template;
 
     const finalPrompt = promptTemplate.replace("{{args}}", diff);
