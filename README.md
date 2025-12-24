@@ -19,7 +19,7 @@
     *   發布檔: `dist/server.js`
 *   **設定檔**:
     *   `gemini-extension.json`: 定義 MCP server 的配置。
-    *   `src/prompts.toml`: 儲存 Prompt 模板，確保邏輯與文字分離。
+    *   `commands/git-commit.toml`: 儲存 Git Commit 的 Prompt 模板。
 
 ## 建置與執行
 
@@ -74,15 +74,24 @@ gemini extension install https://github.com/Benknightdark/neo-mcp
     *   透過 `server.registerPrompt` 註冊功能。
     *   使用 `StdioServerTransport` 進行連接。
 3.  **Prompt 管理**:
-    *   複雜的 Prompt 模板儲存於 `src/prompts.toml`。
-    *   伺服器在執行時讀取此檔案。
+    *   複雜的 Prompt 模板儲存於 `commands/` 目錄下（如 `git-commit.toml`）。
+    *   伺服器在執行時會載入這些檔案。
 4.  **語言**: 目前 Prompt 設計主要針對繁體中文使用者。
 
 ## 目錄結構
 
+
+
 *   `src/`: 原始碼目錄。
+
     *   `server.ts`: 伺服器主要邏輯。
-    *   `prompts.toml`: Prompt 模板設定檔。
+
+*   `commands/`: 指令設定與 Prompt 模板。
+
+    *   `git-commit.toml`: 智慧 Git 提交的 Prompt 模板。
+
 *   `dist/`: 編譯後的輸出目錄 (由 build 產生)。
+
 *   `gemini-extension.json`: 擴充功能清單檔案。
-*   `BUN_CONTEXT.md`: 專為 LLM/Agent 提供的上下文說明文件。
+
+*   `GEMINI.md`: 專為 LLM/Agent 提供的操作標準與指令指南。
